@@ -1,0 +1,7 @@
+node_modules/
+build/
+*.js
+Dockerfile
+docker-compose.yml
+README.md
+LICENSE

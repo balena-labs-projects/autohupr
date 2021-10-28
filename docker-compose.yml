@@ -1,0 +1,12 @@
+version: "2.1"
+
+services:
+  autohupr:
+    build: .
+    tmpfs:
+      - /tmp/work
+    labels:
+      io.balena.features.balena-api: 1
+    environment:
+      HUP_CHECK_INTERVAL: 1d
+      HUP_MAX_RETRIES: 3
