@@ -25,7 +25,6 @@
   "homepage": "https://github.com/balena-io-playground/balenahup-block#readme",
   "dependencies": {
     "balena-sdk": "^15.52.0",
-    "balena-semver": "^2.3.0",
     "ms": "^3.0.0-canary.1"
   },
   "devDependencies": {

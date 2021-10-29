@@ -1,5 +1,4 @@
 import { getSdk, OptionalNavigationResource } from 'balena-sdk';
-import * as semver from 'balena-semver';
 import ms, { StringValue } from 'ms';
 
 const apiKey = (process.env.BALENA_API_KEY as unknown as string) ?? undefined;
@@ -9,10 +8,6 @@ const deviceUuid =
 
 const checkInterval =
 	(process.env.HUP_CHECK_INTERVAL as unknown as StringValue) || '1d';
-const maxRetries = (process.env.HUP_MAX_RETRIES as unknown as number) || 3;
-
-const retryInterval = '5m';
-const statusInterval = '30s';
 
 if (!apiKey) {
 	console.error('BALENA_API_KEY required in environment');
@@ -34,17 +29,11 @@ const balena = getSdk({
 	dataDirectory: '/tmp/work',
 });
 
-enum osUpdateStatus {
-	IN_PROGRESS = 'in_progress',
-	DONE = 'done',
-	ERROR = 'error',
-}
-
 const delay = (value: StringValue) => {
 	try {
 		return new Promise((resolve) => setTimeout(resolve, ms(value)));
 	} catch (e) {
-		console.error(`Error while setting delay: ${e}`);
+		throw e;
 	}
 };
 
@@ -82,107 +71,85 @@ const getTargetVersion = async (
 		});
 };
 
-const isHupInProgress = async (uuid: string): Promise<boolean> => {
+const getUpdateStatus = async (uuid: string): Promise<any> => {
 	try {
 		const hupStatus = await balena.models.device.getOsUpdateStatus(uuid);
-		return hupStatus.status === osUpdateStatus.IN_PROGRESS;
+		console.log(hupStatus);
+		return hupStatus;
 	} catch (e) {
 		console.error(`Error while getting status: ${e}`);
 	}
-	return false;
-};
-
-const isHupFailed = async (
-	uuid: string,
-	targetVersion: string,
-): Promise<boolean> => {
-	try {
-		const hupStatus = await balena.models.device.getOsUpdateStatus(deviceUuid);
-		if (hupStatus.status === osUpdateStatus.ERROR || hupStatus.fatal === true) {
-			return true;
-		} else if (hupStatus.status === osUpdateStatus.DONE) {
-			const deviceVersion = await getDeviceVersion(uuid);
-			if (semver.gt(targetVersion, deviceVersion)) {
-				console.error(
-					`Update complete but version is unchanged! (target ${targetVersion}, current: ${deviceVersion})`,
-				);
-				return true;
-			}
-		}
-	} catch (e) {
-		console.error(`Error while getting status: ${e}`);
-	}
-	return false;
-};
-
-const doUpdate = async (
-	uuid: string,
-	targetVersion: string,
-): Promise<boolean> => {
-	while (!(await balena.models.device.isOnline(uuid))) {
-		console.log('Device is offline...');
-		await delay(statusInterval);
-	}
-
-	while (await isHupInProgress(uuid)) {
-		console.log('Another update is already in progress...');
-		await delay(statusInterval);
-	}
-
-	console.log(`Updating balenaOS host to ${targetVersion}...`);
-	try {
-		await balena.models.device.startOsUpdate(uuid, targetVersion);
-	} catch (e) {
-		console.error(`Error while starting update: ${e}`);
-		return false;
-	}
-
-	while (await isHupInProgress(uuid)) {
-		console.log('Update in progress...');
-		await delay(statusInterval);
-	}
-
-	if (await isHupFailed(uuid, targetVersion)) {
-		console.error('balenaOS host update failed!');
-		return false;
-	}
-
-	console.log('balenaOS host update successful!');
-	return true;
 };
 
 const main = async () => {
 	while (true) {
-		await balena.auth.loginWithToken(apiKey);
+		try {
+			await balena.auth.loginWithToken(apiKey);
+		} catch (e) {
+			console.log(`Authentication failed: ${e}`);
+			process.exit(1);
+		}
+
+		while (!(await balena.models.device.isOnline(deviceUuid))) {
+			console.log('Device is offline...');
+			await delay('2m');
+		}
+
+		console.log('Checking last update status...');
+		while (
+			await getUpdateStatus(deviceUuid).then((status) => {
+				return status.status === 'in_progress';
+			})
+		) {
+			console.log('Another update is already in progress...');
+			await delay('2m');
+		}
 
 		const deviceType = await getDeviceType(deviceUuid);
 		const deviceVersion = await getDeviceVersion(deviceUuid);
 
 		console.log(
-			`Getting recommended release for ${deviceType} at ${deviceVersion}...`,
+			`Getting recommended releases for ${deviceType} at ${deviceVersion}...`,
 		);
 
 		const targetVersion = await getTargetVersion(deviceType, deviceVersion);
 
 		if (!targetVersion) {
-			console.log('No releases found...');
-		} else {
-			let count = 0;
-			while (count < maxRetries) {
-				count++;
-
-				console.log(`Starting update attempt ${count}/${maxRetries}...`);
-
-				if (await doUpdate(deviceUuid, targetVersion)) {
-					break;
-				}
-
-				console.log(`Retrying in ${retryInterval}...`);
-				await delay(retryInterval);
-			}
+			console.log(`No releases found, will check again in ${checkInterval}...`);
+			await delay(checkInterval);
+			break;
 		}
 
-		console.log(`Will check again in ${checkInterval}...`);
+		console.log(`Starting balenaOS host update to ${targetVersion}...`);
+		try {
+			await balena.models.device.startOsUpdate(deviceUuid, targetVersion);
+		} catch (e) {
+			console.error(`Error starting update: ${e}`);
+			await delay(checkInterval);
+			break;
+		}
+
+		while (
+			await getUpdateStatus(deviceUuid).then((status) => {
+				return status.status === 'in_progress';
+			})
+		) {
+			console.log('Update is in progress...');
+			await delay('30s');
+		}
+
+		while (
+			await getUpdateStatus(deviceUuid).then((status) => {
+				return status.status === 'error' || status.fatal;
+			})
+		) {
+			console.error('Failed to update balenaOS host!');
+			await delay(checkInterval);
+			break;
+		}
+
+		// should never get here if running on device as it will reboot first
+		console.log(`Successfully updated balenaOS host to ${targetVersion}!`);
 		await delay(checkInterval);
 	}
 };

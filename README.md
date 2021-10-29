@@ -10,7 +10,6 @@ To run this project, you will need the following environment variables in your c
 - `BALENA_API_URL`: Automatically provided by the balena Supervisor when the `io.balena.features.balena-api` label is used.
 - `BALENA_DEVICE_UUID`: Automatically provided by the balena Supervisor.
 - `HUP_CHECK_INTERVAL`: Interval between checking for available updates. Defaults is 1d.
-- `HUP_MAX_RETRIES`: Max retries if an update fails to apply. Default is 3.
 
 ## Usage/Examples
 
@@ -29,5 +28,4 @@ services:
       io.balena.features.balena-api: 1
     environment:
       HUP_CHECK_INTERVAL: 1d
-      HUP_MAX_RETRIES: 3
 ```
