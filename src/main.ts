@@ -77,7 +77,8 @@ const getUpdateStatus = async (uuid: string): Promise<any> => {
 		console.log(hupStatus);
 		return hupStatus;
 	} catch (e) {
-		console.error(`Error while getting status: ${e}`);
+		console.error(`Error getting status: ${e}`);
+		return false;
 	}
 };
 
@@ -86,8 +87,7 @@ const main = async () => {
 		try {
 			await balena.auth.loginWithToken(apiKey);
 		} catch (e) {
-			console.log(`Authentication failed: ${e}`);
-			process.exit(1);
+			throw e;
 		}
 
 		while (!(await balena.models.device.isOnline(deviceUuid))) {
@@ -98,7 +98,7 @@ const main = async () => {
 		console.log('Checking last update status...');
 		while (
 			await getUpdateStatus(deviceUuid).then((status) => {
-				return status.status === 'in_progress';
+				return !status || status.status === 'in_progress';
 			})
 		) {
 			console.log('Another update is already in progress...');
@@ -115,41 +115,29 @@ const main = async () => {
 		const targetVersion = await getTargetVersion(deviceType, deviceVersion);
 
 		if (!targetVersion) {
-			console.log(`No releases found, will check again in ${checkInterval}...`);
-			await delay(checkInterval);
-			break;
+			console.log(`No releases found!`);
+		} else {
+			console.log(`Starting balenaOS host update to ${targetVersion}...`);
+			await balena.models.device
+				.startOsUpdate(deviceUuid, targetVersion)
+				.then(async () => {
+					while (
+						// print progress at regular intervals until status changes
+						// or device reboots
+						await getUpdateStatus(deviceUuid).then((status) => {
+							return !status || status.status === 'in_progress';
+						})
+					) {
+						await delay('10s');
+					}
+				})
+				.catch((e) => {
+					console.error(e);
+				});
 		}
 
-		console.log(`Starting balenaOS host update to ${targetVersion}...`);
-		try {
-			await balena.models.device.startOsUpdate(deviceUuid, targetVersion);
-		} catch (e) {
-			console.error(`Error starting update: ${e}`);
-			await delay(checkInterval);
-			break;
-		}
-
-		while (
-			await getUpdateStatus(deviceUuid).then((status) => {
-				return status.status === 'in_progress';
-			})
-		) {
-			console.log('Update is in progress...');
-			await delay('30s');
-		}
-
-		while (
-			await getUpdateStatus(deviceUuid).then((status) => {
-				return status.status === 'error' || status.fatal;
-			})
-		) {
-			console.error('Failed to update balenaOS host!');
-			await delay(checkInterval);
-			break;
-		}
-
-		// should never get here if running on device as it will reboot first
-		console.log(`Successfully updated balenaOS host to ${targetVersion}!`);
+		// both success and failure should wait x before trying/checking again
+		console.log(`Will try again in ${checkInterval}...`);
 		await delay(checkInterval);
 	}
 };

@@ -9,7 +9,7 @@ To run this project, you will need the following environment variables in your c
 - `BALENA_API_KEY`: Automatically provided by the balena Supervisor when the `io.balena.features.balena-api` label is used.
 - `BALENA_API_URL`: Automatically provided by the balena Supervisor when the `io.balena.features.balena-api` label is used.
 - `BALENA_DEVICE_UUID`: Automatically provided by the balena Supervisor.
-- `HUP_CHECK_INTERVAL`: Interval between checking for available updates. Defaults is 1d.
+- `HUP_CHECK_INTERVAL`: Interval between checking for available updates. Default is 1d.
 
 ## Usage/Examples
 
