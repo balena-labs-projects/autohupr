@@ -2,30 +2,36 @@
 
 Automatically keep your balenaOS host release up-to-date with this block!
 
-## Environment Variables
+## Usage
 
-To run this project, you will need the following environment variables in your container:
-
-- `BALENA_API_KEY`: Automatically provided by the balena Supervisor when the `io.balena.features.balena-api` label is used.
-- `BALENA_API_URL`: Automatically provided by the balena Supervisor when the `io.balena.features.balena-api` label is used.
-- `BALENA_DEVICE_UUID`: Automatically provided by the balena Supervisor.
-- `HUP_CHECK_INTERVAL`: Interval between checking for available updates. Default is 1d.
-
-## Usage/Examples
-
-Add this block to your fleet application:
-
-1. Clone or download this repo into a subdirectory of your project, eg. `./autohupr`.
-2. Using the [included docker-compose file](./docker-compose.yml) for reference and add this block to your project's `docker-compose.yml`.
+To use this image, add a service in your `docker-compose.yml` file as shown below.
 
 ```yml
 services:
   autohupr:
-    build: ./autohupr
+    # where <arch> is one of aarch64, armv7hf or amd64
+    image: bh.cr/balenablocks/autohupr-<arch>
     tmpfs:
       - /tmp/work
     labels:
       io.balena.features.balena-api: 1
-    environment:
-      HUP_CHECK_INTERVAL: 1d
 ```
+
+To pin to a specific version of this block use:
+
+```yml
+services:
+  volume-keeper:
+    # where <version> is the release semver or release commit ID
+    image: bh.cr/balenablocks/autohupr-<arch>/<version>
+    tmpfs:
+      - /tmp/work
+    labels:
+      io.balena.features.balena-api: 1
+```
+
+## Customization
+
+### Environment Variables
+
+- `HUP_CHECK_INTERVAL`: Interval between checking for available updates. Default is 1d.
