@@ -7,5 +7,3 @@ services:
       - /tmp/work
     labels:
       io.balena.features.balena-api: 1
-    environment:
-      HUP_CHECK_INTERVAL: 1d
