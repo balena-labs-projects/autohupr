@@ -24,8 +24,8 @@
   },
   "homepage": "https://github.com/balena-io-playground/balenahup-block#readme",
   "dependencies": {
-    "balena-sdk": "^15.52.0",
-    "ms": "^3.0.0-canary.1"
+    "balena-sdk": "~15.59.2",
+    "ms": "3.0.0-canary.1"
   },
   "devDependencies": {
     "@balena/lint": "^6.1.1",
