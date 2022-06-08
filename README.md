@@ -21,7 +21,7 @@ To pin to a specific version of this block use:
 
 ```yml
 services:
-  volume-keeper:
+  autohupr:
     # where <version> is the release semver or release commit ID
     image: bh.cr/balenablocks/autohupr-<arch>/<version>
     tmpfs:
