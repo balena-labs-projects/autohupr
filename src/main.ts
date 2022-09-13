@@ -9,6 +9,9 @@ const deviceUuid =
 const checkInterval =
 	(process.env.HUP_CHECK_INTERVAL as unknown as StringValue) || '1d';
 
+const userTargetVersion =
+	(process.env.HUP_TARGET_VERSION as unknown as StringValue) || '';
+
 if (!apiKey) {
 	console.error('BALENA_API_KEY required in environment');
 	process.exit(1);
@@ -62,9 +65,15 @@ const getTargetVersion = async (
 ): Promise<string | null> => {
 	return await balena.models.os
 		.getSupportedOsUpdateVersions(deviceType, deviceVersion)
-		.then((versions) => {
-			if (versions.recommended) {
-				return versions.recommended;
+		.then((osUpdateVersions) => {
+			if (userTargetVersion == '') {
+				if (osUpdateVersions.recommended) {
+					return osUpdateVersions.recommended;
+				} else {
+					return null;
+				}
+			} else if (userTargetVersion != '') {
+				return osUpdateVersions.versions.find(version => version.includes(userTargetVersion))! || null;
 			} else {
 				return null;
 			}
