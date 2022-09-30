@@ -1,5 +1,6 @@
 import { getSdk, OptionalNavigationResource } from 'balena-sdk';
 import ms, { StringValue } from 'ms';
+const lockfile = require('proper-lockfile');
 
 const apiKey = (process.env.BALENA_API_KEY as unknown as string) ?? undefined;
 const apiUrl = (process.env.BALENA_API_URL as unknown as string) ?? undefined;
@@ -11,6 +12,8 @@ const checkInterval =
 
 const userTargetVersion =
 	(process.env.HUP_TARGET_VERSION as unknown as StringValue) || '';
+
+const lockFile = (process.env.BALENA_APP_LOCK_PATH || '/tmp/balena/updates.lock');
 
 if (!apiKey) {
 	console.error('BALENA_API_KEY required in environment');
@@ -91,6 +94,21 @@ const getUpdateStatus = async (uuid: string): Promise<any> => {
 	}
 };
 
+const checkLock = async (): Promise<boolean> => {
+	return lockfile.check(lockFile)
+		.then((isLocked: boolean) => {
+			if (isLocked) {
+				return true;
+			} else {
+				return false;
+			}
+		})
+		.catch((e: any) => {
+			console.error(e.message);
+			return false;
+		});
+};
+
 const main = async () => {
 	while (true) {
 		try {
@@ -99,49 +117,67 @@ const main = async () => {
 			throw e;
 		}
 
-		while (!(await balena.models.device.isOnline(deviceUuid))) {
-			console.log('Device is offline...');
+		const lockExists = await checkLock();
+
+		if (lockExists) {
+			console.log("lockfile found, skipping update...");
 			await delay('2m');
-		}
-
-		console.log('Checking last update status...');
-		while (
-			await getUpdateStatus(deviceUuid).then((status) => {
-				return !status || status.status === 'in_progress';
-			})
-		) {
-			console.log('Another update is already in progress...');
-			await delay('2m');
-		}
-
-		const deviceType = await getDeviceType(deviceUuid);
-		const deviceVersion = await getDeviceVersion(deviceUuid);
-
-		console.log(
-			`Getting recommended releases for ${deviceType} at ${deviceVersion}...`,
-		);
-
-		const targetVersion = await getTargetVersion(deviceType, deviceVersion);
-
-		if (!targetVersion) {
-			console.log(`No releases found!`);
+			continue;
 		} else {
-			console.log(`Starting balenaOS host update to ${targetVersion}...`);
-			await balena.models.device
-				.startOsUpdate(deviceUuid, targetVersion)
-				.then(async () => {
+			lockfile.lock('/tmp/balena/updates', {realpath: false})
+				.then(async (release: any) => {
+
+					while (!(await balena.models.device.isOnline(deviceUuid))) {
+						console.log('Device is offline...');
+						await delay('2m');
+					}
+
+					console.log('Checking last update status...');
 					while (
-						// print progress at regular intervals until status changes
-						// or device reboots
 						await getUpdateStatus(deviceUuid).then((status) => {
 							return !status || status.status === 'in_progress';
 						})
 					) {
-						await delay('10s');
+						console.log('Another update is already in progress...');
+						await delay('2m');
 					}
+
+					const deviceType = await getDeviceType(deviceUuid);
+					const deviceVersion = await getDeviceVersion(deviceUuid);
+
+					console.log(
+						`Getting recommended releases for ${deviceType} at ${deviceVersion}...`,
+					);
+
+					const targetVersion = await getTargetVersion(deviceType, deviceVersion);
+					console.log("TARGET VERSION:", targetVersion);
+
+					if (!targetVersion) {
+						console.log(`No releases found!`);
+					} else {
+						console.log(`Starting balenaOS host update to ${targetVersion}...`);
+						await balena.models.device
+							.startOsUpdate(deviceUuid, targetVersion)
+							.then(async () => {
+								while (
+									// print progress at regular intervals until status changes
+									// or device reboots
+									await getUpdateStatus(deviceUuid).then((status) => {
+										return !status || status.status === 'in_progress';
+									})
+								) {
+									await delay('10s');
+								}
+							})
+							.catch((e: any) => {
+								console.error(e);
+							});
+					}
+
+					return release();
 				})
-				.catch((e) => {
-					console.error(e);
+				.catch((e: any) => {
+					console.log("error locking", e);
 				});
 		}
 
