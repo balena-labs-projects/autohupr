@@ -7,10 +7,9 @@
   "scripts": {
     "clean": "rimraf build",
     "build": "npm run clean && tsc",
-    "lint": "balena-lint --typescript src tests",
-    "lint-fix": "balena-lint --typescript --fix src tests",
-    "test:node": "mocha -r ts-node/register --reporter spec tests/**/*.spec.ts",
-    "test": "npm run lint && npm run build && npm run test:node",
+    "lint": "balena-lint src",
+    "lint-fix": "balena-lint --fix src",
+    "test": "npm run lint && npm run build",
     "prepack": "npm run build"
   },
   "repository": {
