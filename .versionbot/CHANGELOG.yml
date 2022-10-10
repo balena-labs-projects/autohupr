@@ -1,0 +1,104 @@
+- commits:
+    - subject: Switch from balenaCI to flowzone
+      hash: a0b3855e65b93e85bcaf2c310f183b10921644f2
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Pagan Gazzard
+  version: 0.1.2
+  title: ""
+  date: 2022-10-10T16:23:08.270Z
+- version: 0.1.1
+  date: 2022-06-08T13:31:45Z
+  commits:
+    - hash: 1d2a2eda1e6bf1928a17ad6542d661df89cc7f2a
+      author: Kyle Harding
+      footers:
+        change-type: patch
+        signed-off-by: Kyle Harding <kyle@balena.io>
+      subject: Fix typo in readme
+      body: null
+- version: 0.1.0
+- date: 2022-06-07T18:58:29Z
+- commits:
+    - hash: 1a970720823bc1230a22c91f369dcb6df20d36b9
+- commits:
+    - author: Kyle Harding
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Kyle Harding <kyle@balena.io>
+- commits:
+    - subject: Update balena-sdk to v15.59.2
+- commits:
+    - ? body
+- commits:
+    - hash: 9beacab3250dfc4f846bf5e72d3170c9137805ab
+- commits:
+    - author: Kyle Harding
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Kyle Harding <kyle@balena.io>
+- commits:
+    - subject: Add deploy-to-balena github action
+- commits:
+    - ? body
+- commits:
+    - hash: 7cf9149a5fe8e3aee350ffc54b84a1133d940c95
+- commits:
+    - author: Kyle Harding
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Kyle Harding <kyle@balena.io>
+- commits:
+    - subject: Add balena.yml with block description and assets
+- commits:
+    - ? body
+- commits:
+    - hash: 78ab900457b9814e1b43822b1432bd19780ce3a2
+- commits:
+    - author: Kyle Harding
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Kyle Harding <kyle@balena.io>
+- commits:
+    - subject: Update readme and docker-compose examples
+- commits:
+    - ? body
+- commits:
+    - hash: fee87dcde53abdf24bbe5fa4b4f332faad8bfa37
+- commits:
+    - author: Kyle Harding
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Kyle Harding <kyle@balena.io>
+- commits:
+    - subject: Update packages
+- commits:
+    - ? body
+- commits:
+    - hash: 2bc2da9ecb4dab51c562acd106df2903ee798ae7
+- commits:
+    - author: Kyle Harding
+- commits:
+    - footers:
+        signed-off-by: Kyle Harding <kyle@balena.io>
+- commits:
+    - subject: Set balenaCI repo type to generic
+- commits:
+    - ? body
