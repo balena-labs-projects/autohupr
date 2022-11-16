@@ -1,4 +1,17 @@
 - commits:
+    - subject: moving from balenablocks to balena-labs-projects
+      hash: eb3e2c60554d57ea5daff08062db75b60631bd00
+      body: ""
+      footer:
+        Signed-off-by: Flynn Joffray <flynn@balena.io>
+        signed-off-by: Flynn Joffray <flynn@balena.io>
+        Change-type: patch
+        change-type: patch
+      author: Flynn Joffray
+  version: 0.1.3
+  title: ""
+  date: 2022-11-16T03:22:41.751Z
+- commits:
     - subject: Switch from balenaCI to flowzone
       hash: a0b3855e65b93e85bcaf2c310f183b10921644f2
       body: ""
@@ -34,7 +47,7 @@
 - commits:
     - subject: Update balena-sdk to v15.59.2
 - commits:
-    - ? body
+    - body: null
 - commits:
     - hash: 9beacab3250dfc4f846bf5e72d3170c9137805ab
 - commits:
@@ -48,7 +61,7 @@
 - commits:
     - subject: Add deploy-to-balena github action
 - commits:
-    - ? body
+    - body: null
 - commits:
     - hash: 7cf9149a5fe8e3aee350ffc54b84a1133d940c95
 - commits:
@@ -62,7 +75,7 @@
 - commits:
     - subject: Add balena.yml with block description and assets
 - commits:
-    - ? body
+    - body: null
 - commits:
     - hash: 78ab900457b9814e1b43822b1432bd19780ce3a2
 - commits:
@@ -76,7 +89,7 @@
 - commits:
     - subject: Update readme and docker-compose examples
 - commits:
-    - ? body
+    - body: null
 - commits:
     - hash: fee87dcde53abdf24bbe5fa4b4f332faad8bfa37
 - commits:
@@ -90,7 +103,7 @@
 - commits:
     - subject: Update packages
 - commits:
-    - ? body
+    - body: null
 - commits:
     - hash: 2bc2da9ecb4dab51c562acd106df2903ee798ae7
 - commits:
@@ -101,4 +114,4 @@
 - commits:
     - subject: Set balenaCI repo type to generic
 - commits:
-    - ? body
+    - body: null
