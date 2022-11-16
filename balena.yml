@@ -7,7 +7,7 @@ assets:
   repository:
     type: blob.asset
     data:
-      url: 'https://github.com/balenablocks/autohupr'
+      url: 'https://github.com/balena-labs-projects/autohupr'
 data:
   defaultDeviceType: fincm3
   supportedDeviceTypes:

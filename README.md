@@ -10,7 +10,7 @@ To use this image, add a service in your `docker-compose.yml` file as shown belo
 services:
   autohupr:
     # where <arch> is one of aarch64, armv7hf or amd64
-    image: bh.cr/balenablocks/autohupr-<arch>
+    image: bh.cr/balenalabs/autohupr-<arch>
     tmpfs:
       - /tmp/work
     labels:
@@ -23,7 +23,7 @@ To pin to a specific version of this block use:
 services:
   autohupr:
     # where <version> is the release semver or release commit ID
-    image: bh.cr/balenablocks/autohupr-<arch>/<version>
+    image: bh.cr/balenalabs/autohupr-<arch>/<version>
     tmpfs:
       - /tmp/work
     labels:
