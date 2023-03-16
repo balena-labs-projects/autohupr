@@ -35,3 +35,7 @@ services:
 ### Environment Variables
 
 - `HUP_CHECK_INTERVAL`: Interval between checking for available updates. Default is 1d.
+- `HUP_TARGET_VERSION`: The OS version you want balenaHUP to automatically update your
+  device to. This is a required variable to be specified, otherwise, an update won't be
+  performed by default. Set the variable to 'latest'/'recommended' for your device to
+  always update to the latest OS version or set it to a specific version (e.g '2.107.10').
