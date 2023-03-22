@@ -1,4 +1,17 @@
 - commits:
+    - subject: Allow user to set target version
+      hash: 510a52db1468881c10f0d28f064f4a0f150697a3
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: jaomaloy <jao.maloy@balena.io>
+        signed-off-by: jaomaloy <jao.maloy@balena.io>
+      author: jaomaloy
+  version: 0.1.4
+  title: ""
+  date: 2023-03-22T01:37:58.450Z
+- commits:
     - subject: moving from balenablocks to balena-labs-projects
       hash: eb3e2c60554d57ea5daff08062db75b60631bd00
       body: ""
